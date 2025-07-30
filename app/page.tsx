@@ -5,6 +5,7 @@ import Image from "next/image";
 import styles from "./page.module.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faShoppingCart } from "@fortawesome/free-solid-svg-icons";
+import Link from "next/link";
 
 
 const MENU_API_URL = "https://w564vvtx9v.microcms.io/api/v1/menu"; // microCMS のエンドポイント URL
@@ -20,16 +21,20 @@ type MenuItem = {
     width: number;
     height: number;
   };
+  category?: string;
 };
 
 export default function MenuPage() {
-  // menu,cart 表示データを入れる配列、
-  // setMenu,setCart は、menu,cart を更新する関数function
-  const [menu, setMenu] = useState<MenuItem[]>([]);
-  const [cart, setCart] = useState<MenuItem[]>([]);
-  type ModalType = "error" | "checkout" | "thankyou" | null;
-  const [modalType, setModalType] = useState<ModalType>(null);
-  const totalAmount = cart.reduce((sum, item) => sum + Number(item.price), 0); // カートの合計
+
+const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+const [menu, setMenu] = useState<MenuItem[]>([]);
+const [cart, setCart] = useState<MenuItem[]>([]);
+
+// カテゴリ一覧（重複なし）を menu から抽出
+const categories = Array.from(new Set(menu.map((item) => item.category || "その他")));
+type ModalType = "error" | "checkout" | "thankyou" | null;
+const [modalType, setModalType] = useState<ModalType>(null);
+const totalAmount = cart.reduce((sum, item) => sum + Number(item.price), 0); // カートの合計
 
   // useEffect(() => { fetch(...); }, []); 画面の準備が終わったタイミングでmicroCMSからデータを取得する
   useEffect(() => {
@@ -80,7 +85,6 @@ export default function MenuPage() {
     setCart(updated);
     localStorage.setItem("cart", JSON.stringify(updated));
   }
-    
 };
 
   const addOneItem = (item: MenuItem) => {
@@ -91,31 +95,53 @@ export default function MenuPage() {
 
   return (
     <div className={styles.container}>
+      <header className={styles.logoHeader}>
+        <Link href="/" target="_self">
+        <Image src="/logo.png" alt="logo" className={styles.logo} height={50} width={100} />
+        </Link>
+        <button className={styles.cartNone} onClick={() => {
+          const cart = document.getElementById("cart");
+            if (cart) {cart.scrollIntoView({ behavior: "smooth" });}}}>
+            <FontAwesomeIcon icon={faShoppingCart}/>
+          </button>
+      </header>
       {/* メニュー一覧 */}
+
+      <div className={styles.contentArea}>
       <main className={styles.menuList}>
         <h1 className={styles.title}>メニュー一覧</h1>
+          <div className={styles.categoryFilter}>
+            <button className={`${!selectedCategory ? styles.activeCategory : ""}`}
+              onClick={() => setSelectedCategory(null)}>すべて</button>
+          
+          {categories.map((category) => (
+            <button key={category} className={`${selectedCategory === category ? styles.activeCategory : ""}`}
+              onClick={() => setSelectedCategory(category)}>{category}</button>))}
+          </div>
+
         <ul className={styles.list}>
-          {menu.map((item) => (
-            <li key={item.id} className={styles.menuItem}>
+          {(selectedCategory ? menu.filter((item) => item.category === selectedCategory) : menu).map((item) => (
+        <li key={item.id} className={styles.menuItem}>
+            <div className={styles.imgContainer}>
               {item.image && (
                 <Image
                   src={item.image.url}
                   alt={item.name}
                   width={item.image.width}
                   height={item.image.height}
-                  className={styles.menuImage}/>
+                    className={styles.menuImage}
+                  onClick={() => { setSelectedItem(item); setSelectedQuantity(1) }}/>
                 )}
-              <p className={styles.name}>
-                {item.name} 
-              </p>
+              </div>
+              <p className={styles.name}>{item.name}</p>
               {item.comment && <p className={styles.comment}>{item.comment}</p>}
               <div className={styles.priceTag}>
-               <p><strong>{item.price} 円 (税込)</strong></p>
-              <button className={styles.addButton}
-                onClick={() => { setSelectedItem(item); setSelectedQuantity(1) }}>
+                <p><strong>{item.price} 円 (税込)</strong></p>
+                  <button className={styles.addButton}
+                    onClick={() => { setSelectedItem(item); setSelectedQuantity(1) }}>
                   <FontAwesomeIcon icon={faShoppingCart}/>
                 </button>
-                </div>
+              </div>
             </li>
           ))}
         </ul>
@@ -150,14 +176,14 @@ export default function MenuPage() {
 </main>
 
 {/* 注文状況 */}
-<aside className={styles.cart}>
-        <h2 className={styles.cartTitle}>注文カート</h2>
-        <div className={styles.cartTitleName}>
-          <p>商品</p>
-          <p>単価</p>
-          <p>数量</p>
-          <p>小計</p>
-        </div>
+<aside className={styles.cart} id="cart">
+  <h2 className={styles.cartTitle}>注文カート</h2>
+    <div className={styles.cartTitleName}>
+      <p>商品</p>
+      <p className={styles.none}>単価</p>
+      <p>数量</p>
+      <p>小計</p>
+    </div>
   {cart.length === 0 ? (
     <p className={styles.empty}>まだ注文はありません。</p>
   ) : (Object.values(groupedCart).map(({ item, quantity }) => (
@@ -170,7 +196,7 @@ export default function MenuPage() {
               height={100}
           className={styles.cartImage} />
           )}
-          <p>{item.price.toLocaleString()}円</p>
+      <p className={styles.none}>{item.price.toLocaleString()}円</p>
           <p className={styles.cartCounter}>
             <button onClick={() => removeOneItem(item.id)}>－ </button>       
             <span>&nbsp;{quantity}&nbsp;</span>
@@ -181,7 +207,7 @@ export default function MenuPage() {
     ))
   )}
       <div className={styles.cartTotal}>
-        合計金額：{totalAmount.toLocaleString()}円(税込)
+        合計金額：<strong>{totalAmount.toLocaleString()}円(税込)</strong>
       </div>
   <button className={styles.checkoutButton} onClick={() => {
           if (totalAmount === 0) {
@@ -228,8 +254,7 @@ export default function MenuPage() {
 {modalType === "thankyou" && (
   <div className={styles.modalOverlay}>
     <div className={styles.modal}>
-      <h2>ありがとうございました</h2>
-      <Image src="/group_sushi.png" alt="寿司" width={300} height={300} />
+      <h2>ありがとうございました！</h2>
       <p>またのご来店をお待ちしております。</p>
       <button className={styles.confirm} onClick={() => setModalType(null)}>
         トップに戻る
@@ -237,6 +262,7 @@ export default function MenuPage() {
     </div>
   </div>
 )}
-    </div>
+</div>
+</div>
   );
 }
