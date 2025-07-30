@@ -39,6 +39,7 @@ h1, h2 {
 }
 
 button {
+  margin-top: 0.5rem;
   padding: 0.25rem 0.5rem;
   font-size: 1rem;
   background-color: #8B5E3C;
@@ -68,7 +69,6 @@ img {
 
 aside{
   background-color: #F9F6EF;
-
 }
 
 @media (max-width: 600px) {

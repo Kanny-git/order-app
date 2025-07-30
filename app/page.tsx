@@ -168,7 +168,7 @@ const totalAmount = cart.reduce((sum, item) => sum + Number(item.price), 0); // 
           const updated = [...cart, ...Array.from({ length: selectedQuantity }, () => selectedItem)];
           localStorage.setItem("cart", JSON.stringify(updated));
           setCart(updated);
-          setSelectedItem(null);}}>カートに追加</button>
+          setSelectedItem(null);}}>カート追加</button>
       </div>
     </div>
   </div>

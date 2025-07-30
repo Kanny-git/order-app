@@ -240,6 +240,10 @@
   place-items: center;
 }
 
+.cartTitleName{
+  margin: 0.5rem;
+}
+
 .cartName{
   text-align: center;
 }
@@ -335,7 +339,7 @@
 
 .actions {
   display: flex;
-  justify-content: space-between;
+  align-items: center;
   gap: 1rem;
 }
 
@@ -454,10 +458,6 @@
 
   .cartTitleName,.cartItem{
     grid-template-columns: 1fr 1fr 1fr;
-  }
-
-  .cartTitleName{
-    margin: 0.5rem;
   }
 
   .logo {
