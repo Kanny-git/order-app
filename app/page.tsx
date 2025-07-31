@@ -97,7 +97,7 @@ const totalAmount = cart.reduce((sum, item) => sum + Number(item.price), 0); // 
     <div className={styles.container}>
       <header className={styles.logoHeader}>
         <Link href="/" target="_self">
-        <Image src="/logo.png" alt="logo" className={styles.logo} height={50} width={100} />
+          <Image src="/logo.png" alt="logo" className={styles.logo} height={50} width={100} />
         </Link>
         <button className={styles.cartNone} onClick={() => {
           const cart = document.getElementById("cart");
@@ -121,16 +121,16 @@ const totalAmount = cart.reduce((sum, item) => sum + Number(item.price), 0); // 
 
         <ul className={styles.list}>
           {(selectedCategory ? menu.filter((item) => item.category === selectedCategory) : menu).map((item) => (
-        <li key={item.id} className={styles.menuItem}>
-            <div className={styles.imgContainer}>
-              {item.image && (
-                <Image
-                  src={item.image.url}
-                  alt={item.name}
-                  width={item.image.width}
-                  height={item.image.height}
+            <li key={item.id} className={styles.menuItem}>
+              <div className={styles.imgContainer}>
+                {item.image && (
+                  <Image
+                    src={item.image.url}
+                    alt={item.name}
+                    width={item.image.width}
+                    height={item.image.height}
                     className={styles.menuImage}
-                  onClick={() => { setSelectedItem(item); setSelectedQuantity(1) }}/>
+                    onClick={() => { setSelectedItem(item); setSelectedQuantity(1) }}/>
                 )}
               </div>
               <p className={styles.name}>{item.name}</p>
@@ -184,6 +184,7 @@ const totalAmount = cart.reduce((sum, item) => sum + Number(item.price), 0); // 
       <p>数量</p>
       <p>小計</p>
     </div>
+          
   {cart.length === 0 ? (
     <p className={styles.empty}>まだ注文はありません。</p>
   ) : (Object.values(groupedCart).map(({ item, quantity }) => (
@@ -194,12 +195,12 @@ const totalAmount = cart.reduce((sum, item) => sum + Number(item.price), 0); // 
               alt={item.name}
               width={100}
               height={100}
-          className={styles.cartImage} />
+              className={styles.cartImage} />
           )}
-      <p className={styles.none}>{item.price.toLocaleString()}円</p>
+        <p className={styles.none}>{item.price.toLocaleString()}円</p>
           <p className={styles.cartCounter}>
             <button onClick={() => removeOneItem(item.id)}>－ </button>       
-            <span>&nbsp;{quantity}&nbsp;</span>
+              <span>&nbsp;{quantity}&nbsp;</span>
             <button onClick={() => addOneItem(item)}>＋</button>        
           </p>
           <p>{(item.price * quantity).toLocaleString()}円</p>
@@ -209,16 +210,16 @@ const totalAmount = cart.reduce((sum, item) => sum + Number(item.price), 0); // 
       <div className={styles.cartTotal}>
         合計金額：<strong>{totalAmount.toLocaleString()}円(税込)</strong>
       </div>
-  <button className={styles.checkoutButton} onClick={() => {
+        <button className={styles.checkoutButton} onClick={() => {
           if (totalAmount === 0) {
             setModalType("error"); // 0円エラー表示
           } else {
             setModalType("checkout"); // 会計確認表示
           }}}>会計する
-  </button>
+        </button>
 </aside>
 
-  {modalType === "error" && (
+{modalType === "error" && (
   <div className={styles.modalOverlay}>
     <div className={styles.modal}>
       <h2>エラー</h2>
@@ -242,9 +243,7 @@ const totalAmount = cart.reduce((sum, item) => sum + Number(item.price), 0); // 
             localStorage.removeItem("cart");
             setCart([]);
             setModalType("thankyou");
-          }}
-        >
-          会計する
+          }}>会計する
         </button>
       </div>
     </div>
