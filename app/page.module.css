@@ -346,6 +346,7 @@
 }
 
 .categoryFilter button {
+  margin: 0;
   padding: 0.5rem 1rem;
   background-color: #8B5E3C;
   border: none;
